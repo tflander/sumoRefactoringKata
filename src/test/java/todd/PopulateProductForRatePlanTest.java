@@ -1,13 +1,5 @@
 package todd;
 
-import com.ford.sumo.domain.CatalogProduct;
-import com.ford.sumo.domain.ProductRatePlan;
-import com.ford.sumo.domain.UserGuid;
-import com.ford.sumo.domain.VehicleIdentificationNumber;
-import com.ford.sumo.domain.v2.*;
-import com.ford.sumo.infrastructure.RequestMetaData;
-import com.ford.sumo.ordermanager.client.ProductClient;
-import com.ford.sumo.ordermanager.domain.FulfillmentContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +7,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import todd.domain.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,20 +71,19 @@ public class PopulateProductForRatePlanTest {
 
 
     @Test
-    public void test_execute()
-    {
+    public void test_execute() {
 
         ArgumentCaptor<Fulfillment> fulfillmentCaptor = ArgumentCaptor.forClass(Fulfillment.class);
-        ArgumentCaptor<RequestMetaData> requestMetaDataCaptor= ArgumentCaptor.forClass(RequestMetaData.class);
+        ArgumentCaptor<RequestMetaData> requestMetaDataCaptor = ArgumentCaptor.forClass(RequestMetaData.class);
 
         assertTrue(classUnderTest.execute(fulfillmentContext));
-        verify(productClient,times(1)).getProductCatalog(fulfillmentCaptor.capture(),requestMetaDataCaptor.capture());
+        verify(productClient, times(1)).getProductCatalog(fulfillmentCaptor.capture(), requestMetaDataCaptor.capture());
 
-        assertEquals(fulfillmentContext.getFulfillment(),fulfillmentCaptor.getValue());
-        assertEquals("traceID",requestMetaDataCaptor.getValue().getTraceId());
-        assertEquals("populatedRatePlanID",fulfillmentContext.getFulfillment().getFulfillmentProduct()
+        assertEquals(fulfillmentContext.getFulfillment(), fulfillmentCaptor.getValue());
+        assertEquals("traceID", requestMetaDataCaptor.getValue().getTraceId());
+        assertEquals("populatedRatePlanID", fulfillmentContext.getFulfillment().getFulfillmentProduct()
                 .getProductRatePlan().getProductRatePlanId());
-        assertEquals("sku",fulfillmentContext.getFulfillment().getFulfillmentProduct().getProduct().getSku());
+        assertEquals("sku", fulfillmentContext.getFulfillment().getFulfillmentProduct().getProduct().getSku());
 
     }
 }

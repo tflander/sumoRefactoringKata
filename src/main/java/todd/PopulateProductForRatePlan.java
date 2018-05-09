@@ -1,27 +1,14 @@
 package todd;
 
-import com.ford.sumo.domain.CatalogProduct;
-import com.ford.sumo.domain.v2.Fulfillment;
-import com.ford.sumo.exception.aspect.SumoExceptionAnnotation;
-import com.ford.sumo.infrastructure.SumoMessageContext;
-import com.ford.sumo.log.Logged;
-import com.ford.sumo.ordermanager.client.ProductClient;
-import com.ford.sumo.ordermanager.domain.FulfillmentContext;
-import com.ford.sumo.pipeline.Step;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import todd.domain.*;
 
-@Component
-@Logged
-@Slf4j
 @AllArgsConstructor
-public class PopulateProductForRatePlan implements Step {
+public class PopulateProductForRatePlan implements Step /* implements Step */ {
 
     private final ProductClient productClient;
 
     @Override
-    @SumoExceptionAnnotation
     public boolean execute(SumoMessageContext sumoMessageContext) {
         FulfillmentContext fulfillmentContext = (FulfillmentContext) sumoMessageContext;
 
