@@ -16,34 +16,23 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class PopulateProductForRatePlanTest {
 
-    @Mock
-    private ProductClient productClient;
-
     @InjectMocks
     private PopulateProductForRatePlan populateProductForRatePlan;
+
+    @Mock
+    private ProductClient productClient;
 
     private FulfillmentContext fulfillmentContext;
     private Product productFromProductClient;
 
     private Fulfillment fulfillmentInFulfullmentContext;
     private RequestMetaData requestMetaDataInFulfullmentContext;
-    ProductRatePlan populatedRatePlanIDFromProductClient = ProductRatePlan.builder().productRatePlanId("populatedRatePlanIDFromProductClient").build();
+    ProductRatePlan populatedRatePlanIDFromProductClient;
 
     @Before
     public void setUp() {
         givenFulfillmentRequest();
         expectProductFromProductClient();
-    }
-
-    @Test
-    public void executeReturnsTrue() throws Exception {
-        assertTrue(populateProductForRatePlan.execute(fulfillmentContext));
-    }
-
-    @Test
-    public void executeCallsTheProductClient() throws Exception {
-        populateProductForRatePlan.execute(fulfillmentContext);
-        verify(productClient).getProductCatalog(fulfillmentInFulfullmentContext, requestMetaDataInFulfullmentContext);
     }
 
     @Test
@@ -60,8 +49,19 @@ public class PopulateProductForRatePlanTest {
         assertSame(getProductRatePlanFromContext(), populatedRatePlanIDFromProductClient);
     }
 
+    @Test
+    public void executeReturnsTrue() throws Exception {
+        assertTrue(populateProductForRatePlan.execute(fulfillmentContext));
+    }
+
+    @Test
+    public void executeCallsTheProductClient() throws Exception {
+        populateProductForRatePlan.execute(fulfillmentContext);
+        verify(productClient).getProductCatalog(fulfillmentInFulfullmentContext, requestMetaDataInFulfullmentContext);
+    }
 
     private void expectProductFromProductClient() {
+        populatedRatePlanIDFromProductClient = ProductRatePlan.builder().productRatePlanId("populatedRatePlanIDFromProductClient").build();
         productFromProductClient = Product.builder().build();
         CatalogProduct catalogProduct = CatalogProduct.builder()
                 .product(productFromProductClient)
