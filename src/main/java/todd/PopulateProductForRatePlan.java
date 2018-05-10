@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import todd.domain.*;
 
 @AllArgsConstructor
-public class PopulateProductForRatePlan implements Step /* implements Step */ {
+public class PopulateProductForRatePlan implements Step {
 
     private final ProductClient productClient;
 
