@@ -3,17 +3,14 @@ package todd;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import todd.domain.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -23,67 +20,79 @@ public class PopulateProductForRatePlanTest {
     private ProductClient productClient;
 
     @InjectMocks
-    private PopulateProductForRatePlan classUnderTest;
+    private PopulateProductForRatePlan populateProductForRatePlan;
 
     private FulfillmentContext fulfillmentContext;
+    private Product productFromProductClient;
+
+    private Fulfillment fulfillmentInFulfullmentContext;
+    private RequestMetaData requestMetaDataInFulfullmentContext;
+    ProductRatePlan populatedRatePlanIDFromProductClient = ProductRatePlan.builder().productRatePlanId("populatedRatePlanIDFromProductClient").build();
 
     @Before
     public void setUp() {
-
-        Fulfillment fulfillment = Fulfillment.builder()
-                .fulfillmentProduct(FulfillmentProduct
-                        .builder()
-                        .product(Product.builder().build())
-                        .productRatePlan(ProductRatePlan.builder().productRatePlanId("ratePlanID").build())
-                        .build())
-                .vehicle(Vehicle.builder()
-                        .vin(VehicleIdentificationNumber.builder().value("vin").build())
-                        .build())
-                .user(User.builder().userGuid(UserGuid.builder()
-                        .value("guid")
-                        .build())
-                        .accountKey("accountKey")
-                        .customerType("F")
-                        .build())
-                .build();
-
-        RequestMetaData requestMetaData = RequestMetaData.builder()
-                .traceId("traceID")
-                .build();
-
-        fulfillmentContext = FulfillmentContext.builder()
-                .fulfillment(fulfillment)
-                .requestMetaData(requestMetaData)
-                .build();
-
-        List<ProductRatePlan> productRatePlans = new ArrayList<>();
-
-        productRatePlans.add(ProductRatePlan.builder().productRatePlanId("populatedRatePlanID").build());
-
-        CatalogProduct catalogProduct = CatalogProduct.builder()
-                .product(Product.builder().sku("sku").build())
-                .productRatePlanList(productRatePlans)
-                .build();
-
-
-        when(productClient.getProductCatalog(fulfillment, requestMetaData)).thenReturn(catalogProduct);
+        givenFulfillmentRequest();
+        expectProductFromProductClient();
     }
-
 
     @Test
-    public void test_execute() {
-
-        ArgumentCaptor<Fulfillment> fulfillmentCaptor = ArgumentCaptor.forClass(Fulfillment.class);
-        ArgumentCaptor<RequestMetaData> requestMetaDataCaptor = ArgumentCaptor.forClass(RequestMetaData.class);
-
-        assertTrue(classUnderTest.execute(fulfillmentContext));
-        verify(productClient, times(1)).getProductCatalog(fulfillmentCaptor.capture(), requestMetaDataCaptor.capture());
-
-        assertEquals(fulfillmentContext.getFulfillment(), fulfillmentCaptor.getValue());
-        assertEquals("traceID", requestMetaDataCaptor.getValue().getTraceId());
-        assertEquals("populatedRatePlanID", fulfillmentContext.getFulfillment().getFulfillmentProduct()
-                .getProductRatePlan().getProductRatePlanId());
-        assertEquals("sku", fulfillmentContext.getFulfillment().getFulfillmentProduct().getProduct().getSku());
-
+    public void executeReturnsTrue() throws Exception {
+        assertTrue(populateProductForRatePlan.execute(fulfillmentContext));
     }
+
+    @Test
+    public void executeCallsTheProductClient() throws Exception {
+        populateProductForRatePlan.execute(fulfillmentContext);
+        verify(productClient).getProductCatalog(fulfillmentInFulfullmentContext, requestMetaDataInFulfullmentContext);
+    }
+
+    @Test
+    public void executeSetsTheProduct() throws Exception {
+        assertNull(productFromFulfillmentContext());
+        populateProductForRatePlan.execute(fulfillmentContext);
+        assertSame(productFromFulfillmentContext(), productFromProductClient);
+    }
+
+    @Test
+    public void executeSetsTheProductRatePlan() {
+        assertNull(getProductRatePlanFromContext());
+        populateProductForRatePlan.execute(fulfillmentContext);
+        assertSame(getProductRatePlanFromContext(), populatedRatePlanIDFromProductClient);
+    }
+
+
+    private void expectProductFromProductClient() {
+        productFromProductClient = Product.builder().build();
+        CatalogProduct catalogProduct = CatalogProduct.builder()
+                .product(productFromProductClient)
+                .productRatePlanList(Arrays.asList(populatedRatePlanIDFromProductClient))
+                .build();
+
+
+        when(productClient.getProductCatalog(fulfillmentInFulfullmentContext, requestMetaDataInFulfullmentContext)).thenReturn(catalogProduct);
+    }
+
+    private void givenFulfillmentRequest() {
+        fulfillmentInFulfullmentContext = Fulfillment.builder()
+                .fulfillmentProduct(FulfillmentProduct
+                        .builder()
+                        .build())
+                .build();
+
+        requestMetaDataInFulfullmentContext = RequestMetaData.builder().build();
+
+        fulfillmentContext = FulfillmentContext.builder()
+                .fulfillment(fulfillmentInFulfullmentContext)
+                .requestMetaData(requestMetaDataInFulfullmentContext)
+                .build();
+    }
+
+    private ProductRatePlan getProductRatePlanFromContext() {
+        return fulfillmentContext.getFulfillment().getFulfillmentProduct().getProductRatePlan();
+    }
+
+    private Product productFromFulfillmentContext() {
+        return fulfillmentContext.getFulfillment().getFulfillmentProduct().getProduct();
+    }
+
 }
