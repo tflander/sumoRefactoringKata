@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import todd.domain.*;
 
 @AllArgsConstructor
-public class PopulateProductForRatePlan implements Step /* implements Step */ {
+public class PopulateProductForRatePlanStep implements Step {
 
     private final ProductClient productClient;
 
@@ -21,13 +21,8 @@ public class PopulateProductForRatePlan implements Step /* implements Step */ {
      * @param fulfillmentContext
      */
     private void enrichFulfilmentWithProduct(FulfillmentContext fulfillmentContext) {
-        //String ratePlanId = fulfillmentContext.getFulfillment().getFulfillmentProduct().getProductRatePlan().getProductRatePlanId();
         CatalogProduct catalogProduct = lookupCatalogProduct(fulfillmentContext);
         FulfillmentProduct fulfillmentProduct = fulfillmentContext.getFulfillment().getFulfillmentProduct();
-        updateProductAndRatePlanFromCatalogProduct(fulfillmentProduct, catalogProduct);
-    }
-
-    private void updateProductAndRatePlanFromCatalogProduct(FulfillmentProduct fulfillmentProduct, CatalogProduct catalogProduct) {
         fulfillmentProduct.setProduct(catalogProduct.getProduct());
         fulfillmentProduct.setProductRatePlan(catalogProduct.getProductRatePlanList().get(0));
     }
