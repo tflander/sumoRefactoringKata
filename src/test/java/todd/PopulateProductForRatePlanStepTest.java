@@ -54,16 +54,10 @@ public class PopulateProductForRatePlanStepTest {
         assertSame(fulfillmentContext.getFulfillment().getFulfillmentProduct().getProductRatePlan(), expectedRatePlanId);
     }
 
-    @Test
-    public void executeReturnsTrue() throws Exception {
-        assertTrue(populateProductForRatePlanStep.execute(fulfillmentContext));
-    }
-
-    @Test
-    public void executeCallsTheProductClient() throws Exception {
-        populateProductForRatePlanStep.execute(fulfillmentContext);
-        verify(productClient).getProductCatalog(fulfillmentInFulfullmentContext, requestMetaDataInFulfullmentContext);
-    }
+//    @Test
+//    public void executeReturnsTrue() throws Exception {
+//        assertTrue(populateProductForRatePlanStep.execute(fulfillmentContext));
+//    }
 
     private CatalogProduct expectedCatalogProduct() {
         ProductRatePlan ratePlanId = ProductRatePlan.builder().productRatePlanId("expectedRatePlanId").build();

@@ -1,7 +1,5 @@
 package todd.domain;
 
-public class ProductClient {
-    public CatalogProduct getProductCatalog(Fulfillment fulfillment, RequestMetaData requestMetaData) {
-        return null;
-    }
+public interface ProductClient {
+    CatalogProduct getProductCatalog(Fulfillment fulfillment, RequestMetaData requestMetaData);
 }
